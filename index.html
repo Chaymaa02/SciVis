@@ -499,12 +499,41 @@ function updateTransferFunction(gl, transferFunction) {
       .domain([0, 255])
       .range([0, width]);
 
+    // var n1 = new Node(0, 0, 0, 0);
+    // var n2 = new Node(0, 0, 0, 0);
+
+    // let current_pixel = 0;
+
+    //loop through the nodes
+    // for (let j = 0; j < nodes.length; j++) {
+    //     while(current_pixel <= nodes[j]){
+    //       // Get the pair of nodes (points) to interpolate between
+    //       if(j=0){
+    //         n2 = node[j];
+    //       }
+    //       else{
+    //         n1 = node[j-1];
+    //         n2 = node[j];
+    //       }
+    //       // Determine interpolator
+    //       const t = (x(i) - n1.position) / (n2.position - n1.position);
+
+    //       // Interpolate values
+    //       data[dataIndex++] = n1.r + t * (n2.r - n1.r);
+    //       data[dataIndex++] = n1.g + t * (n2.g - n1.g);
+    //       data[dataIndex++] = n1.b + t * (n2.b - n1.b);
+    //       data[dataIndex++] = n1.opacity + t * (n2.opacity - n1.opacity);
+
+    //       current_pixel++;
+    //     }
+    // }
+
     for (let i = 0; i < 256; i++) {
       // Get the pair of nodes (points) to interpolate between
       var n1 = new Node(0, 0, 0, 0);
       var n2 = new Node(0, 0, 0, 0);
       // Loop through the nodes and check if the x position of the
-      // next node is less than the current x position
+      // current pixel is less than the x position of the next node
       for (let j = 0; j < nodes.length - 1; j++) {
         if (x(i) <= nodes[j + 1].position) {
           n1 = nodes[j];
