@@ -493,40 +493,13 @@ function updateTransferFunction(gl, transferFunction) {
   // @TODO:  Replace the transfer function specification above with your own transfer
   //         function editor result
 
+  //sort the nodes
+  nodes.sort(function(a, b){return a.position - b.position});
   // Sample and interpolate between the nodes
     let dataIndex = 0;
     var x = d3.scaleLinear()
       .domain([0, 255])
       .range([0, width]);
-
-    // var n1 = new Node(0, 0, 0, 0);
-    // var n2 = new Node(0, 0, 0, 0);
-
-    // let current_pixel = 0;
-
-    //loop through the nodes
-    // for (let j = 0; j < nodes.length; j++) {
-    //     while(current_pixel <= nodes[j]){
-    //       // Get the pair of nodes (points) to interpolate between
-    //       if(j=0){
-    //         n2 = node[j];
-    //       }
-    //       else{
-    //         n1 = node[j-1];
-    //         n2 = node[j];
-    //       }
-    //       // Determine interpolator
-    //       const t = (x(i) - n1.position) / (n2.position - n1.position);
-
-    //       // Interpolate values
-    //       data[dataIndex++] = n1.r + t * (n2.r - n1.r);
-    //       data[dataIndex++] = n1.g + t * (n2.g - n1.g);
-    //       data[dataIndex++] = n1.b + t * (n2.b - n1.b);
-    //       data[dataIndex++] = n1.opacity + t * (n2.opacity - n1.opacity);
-
-    //       current_pixel++;
-    //     }
-    // }
 
     for (let i = 0; i < 256; i++) {
       // Get the pair of nodes (points) to interpolate between
@@ -535,7 +508,7 @@ function updateTransferFunction(gl, transferFunction) {
       // Loop through the nodes and check if the x position of the
       // current pixel is less than the x position of the next node
       for (let j = 0; j < nodes.length - 1; j++) {
-        if (x(i) <= nodes[j + 1].position) {
+        if (x(i) <= nodes[j + 1].position && x(i) > nodes[0].position) {
           n1 = nodes[j];
           n2 = nodes[j + 1];
           break;
@@ -578,13 +551,39 @@ function update_nodeList(){
   var node = new Node(node_r, node_g, node_b, node_position, node_opacity);
   //Add the node to the list of nodes
   nodes.push(node);
+  //sort the nodes
+  nodes.sort(function(a, b){return a.position - b.position});  
+  //visualize the nides
   visualize(nodes);
 
   //update trasfer function
   triggerTransferFunctionUpdate();
+
+
 }
 
+// This function sets the list of nodes to an empty list
+function reset_node_list(){
+  nodes = [];
+  //update trasfer function
+  triggerTransferFunctionUpdate();
+  //clear plot
+  d3.selectAll("svg > *").remove();
 
+}
+
+function reset_node(){
+  var node_index = document.getElementById("node_index").value;
+  if(node_index<nodes.length){
+    var position = document.getElementById("position").value;
+    nodes[node_index].position = position;
+    var opacity = document.getElementById("opacity").value;
+    nodes[node_index].opacity = opacity;
+  }
+  visualize(nodes);
+  //update trasfer function
+  triggerTransferFunctionUpdate();
+}
 
 /// Function that renders the bounding box using the provided model and view matrices. The
 /// front-facing triangles are rendered into the framebuffer provided at 'fbFront', the
@@ -1129,6 +1128,15 @@ function postError(msg) {
 
   <!-- Add button -->
   <button id="demo" onclick="update_nodeList()">Add node</button>
+  <button id="reset" onclick="reset_node_list()">Reset Transfer function</button>
+<p>
+  Update the nodes
+  <!-- Number -->
+  <br> Index of the node <br>
+  <input type="number" name="usrname" value=0 id="node_index">
+  <div> Position: <input type="range" min="0" max="255" value="50" class="slider" id="position" oninput="reset_node();"></div>
+  <div> Opacity: <input type="range" min="0" max="255" value="50" class="slider" id="opacity" oninput="reset_node();"></div>
+</p>
   
 </body>
 
@@ -1147,6 +1155,10 @@ var margin = {top: 10, right: 30, bottom: 30, left: 60},
     width = 460 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
+//Visualize the list of node
+function visualize(nodes){
+  d3.selectAll("svg").remove();
+  
 // append the svg object to the body of the page
 var svg = d3.select("#my_dataviz")
   .append("svg")
@@ -1155,11 +1167,8 @@ var svg = d3.select("#my_dataviz")
   .append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
-
-//Visualize the list of node
-function visualize(nodes){
-  // Add X axis (position)
-  var x = d3.scaleLinear()
+// Add X axis (position)
+var x = d3.scaleLinear()
     .domain([0, 300])
     .range([ 0, width ]);
   svg.append("g")
