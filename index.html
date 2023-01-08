@@ -582,8 +582,9 @@ function reset_node(){
   }
   visualize(nodes);
   //update trasfer function
-  triggerTransferFunctionUpdate();
+  //triggerTransferFunctionUpdate();
 }
+
 
 /// Function that renders the bounding box using the provided model and view matrices. The
 /// front-facing triangles are rendered into the framebuffer provided at 'fbFront', the
@@ -1137,6 +1138,8 @@ function postError(msg) {
   <div> Position: <input type="range" min="0" max="255" value="50" class="slider" id="position" oninput="reset_node();"></div>
   <div> Opacity: <input type="range" min="0" max="255" value="50" class="slider" id="opacity" oninput="reset_node();"></div>
 </p>
+<button id="demo" onclick="triggerTransferFunctionUpdate()">update transfer function</button>
+
   
 </body>
 
